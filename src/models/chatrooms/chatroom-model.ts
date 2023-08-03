@@ -2,6 +2,7 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../../utils";
 import { Messages } from "../messages/message-model";
+import { User } from "../user/user-model";
 
 
 
@@ -16,40 +17,54 @@ ChatRoom.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
     },
     title: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            len: [10, 20]
+            len: [5, 20]
+        }
+    },
+    description: {
+        type: DataTypes.STRING,
+        validate: {
+            len: [0, 300],
+
         }
     },
     slug: {
         type: DataTypes.STRING,
-        allowNull: false,
         unique: true,
-        set(val) {
-            const slug = (val as string)
-                .trim() // Remove leading and trailing spaces
-                .toLowerCase() // Convert the string to lowercase
-                .replace(/[^a-zA-Z0-9]+/g, '-') // Replace non-alphanumeric characters with dashes
-                .replace(/-{2,}/g, '-') // Replace multiple dashes with a single dash
-                .replace(/^-|-$/g, ''); // Remove leading and trailing dashes
-
-            this.setDataValue("slug", slug)
-        },
-        get() {
-            return this.getDataValue("slug");
-        }
     }
 
 }, {
     sequelize,
     createdAt: true,
     deletedAt: true,
-    modelName: "ChatRoom"
+    modelName: "ChatRoom",
+    hooks: {
+        beforeCreate(attributes, _) {
+            const title = attributes.getDataValue("title")
+            const slug = generateSlug(title);
+            attributes.setDataValue("slug", slug);
+        },
+    }
 })
+// Associations
+// User.hasMany(Messages);
+Messages.belongsTo(ChatRoom,);
+//Messages.belongsTo(User);
+ChatRoom.hasMany(Messages,);
 
 
-ChatRoom.hasMany(Messages, { foreignKey: "id", as: "messages" });
+
+function generateSlug(title: string) {
+    return title
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/-{2,}/g, '-')
+        .replace(/^-|-$/g, '');
+
+}

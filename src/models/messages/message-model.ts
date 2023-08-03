@@ -23,4 +23,3 @@ Messages.init({
     modelName: "Messages",
 })
 
-Messages.belongsTo(ChatRoom, { foreignKey: "id", as: "chatroom" });

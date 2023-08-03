@@ -19,15 +19,15 @@ interface IUser {
 }
 
 interface IMessage{
-    id:ID!
-    content:String!
-    sentBy:User!
+    id:ID
+    content:String
+
 }
 
 interface IChatRoom{
-    id:ID!
-    title:String!
-    slug:String!
+    id:ID
+    title:String
+    slug:String
     messages:[Message]
 }
 
@@ -45,15 +45,22 @@ type User implements IUser{
 type Message implements IMessage{
     id:ID!
     content:String!
-    sentBy:User!
+    room:ChatRoom
+
 }
 
 type ChatRoom implements IChatRoom{
-    id:ID!
-    title:String!
-    slug:String!
+    id:ID
+    title:String
+    description:String
+    slug:String
     messages:[Message]
 
+}
+
+type SearchChatRoom  {
+    id:ID!
+    title:String!
 }
 
 type Test{
@@ -82,14 +89,33 @@ type Query{
     ## FOR TEST
     greeting: Test
 
+    ### FOR USER
     user(ID:ID!): User!
     users: [User]!
+
+    ## FOR MESSAGES
+    message(ID:ID!): Message
+    messages: [Message]!
+
+
+    ## FOR CHATROOM
+    chatRoom(ID:ID!):ChatRoom
+    chatRoomList(slug:String!):[SearchChatRoom]
 }
 
 
 ### Mutations
 type Mutation{
+
+    ### USER MUTATIONS #######
     createUser(createinput:NewUserInput!): User!
     updateUser(uname:String,updateinput:UpdateUserInput):User!
     deleteUser(uid:ID!):User!
+
+    ### CHATROOM MUTATIONS ####
+    createChatRoom(title:String):ChatRoom!
+    updateChatRoom(id:ID!,title:String):ChatRoom!
+
+
+    addMessage(slug:String!,message:String):ChatRoom
 }
