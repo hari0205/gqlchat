@@ -4,6 +4,7 @@ import { createUserResolver, deleteUserResolver, updateUserResolver } from "../s
 import { addMessageMutation, createChatRoomMutation, updateChatRoomMutation } from "../services/chatroom/chatroom-service"
 import { ChatRoom } from "../models/chatrooms/chatroom-model"
 import { Messages } from "../models/messages/message-model"
+import { formatResponse } from "../utils"
 
 
 
@@ -27,9 +28,15 @@ export const resolvers = {
             return users;
         },
         chatRoom: async (_parent: unknown, { ID }: { ID: string }, _ctx: any) => {
-            const chatroom = await ChatRoom.findByPk(ID);
+            const chatroom = await ChatRoom.findOne({
+                where: {
+                    id: ID,
+                },
+                include: [Messages]
+            });
             if (!chatroom) throw new GraphQLError(`Could not find chatroom with ID ${ID}`)
-            return chatroom;
+            const res = formatResponse(chatroom)
+            return res;
         },
         // TODO: Implement full text search
         chatRoomList: async (_parent: unknown, { slug }: { slug: string }, _ctx: any) => {

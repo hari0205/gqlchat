@@ -51,25 +51,12 @@ export const addMessageMutation = async (_parent: unknown, { slug, message }: { 
         where: {
             slug,
         },
-        include: {
-            model: Messages,
-        }
+        include: [Messages]
     })
 
-    console.log(typeof updateChatRoom)
     if (!updateChatRoom) throw new Error("Could not find chatroom. Try again");
 
-    // TODO: Refactor this later.
-    const chatRoomResponse = {
-        id: updateChatRoom?.dataValues.id,
-        title: updateChatRoom?.dataValues.title,
-        description: updateChatRoom?.dataValues.description,
-        slug: updateChatRoom?.dataValues.slug,
-        createdAt: updateChatRoom?.dataValues.createdAt,
-        updatedAt: updateChatRoom?.dataValues.updatedAt,
-        messages: updateChatRoom?.dataValues.Messages // Use the transformed Messages array from the Sequelize response
-    };
+    const res = formatResponse(updateChatRoom);
 
-
-    return chatRoomResponse;
+    return res;
 }

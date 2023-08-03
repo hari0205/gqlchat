@@ -1,42 +1,19 @@
 import { Model } from "sequelize";
+import { ChatRoom } from "../models/chatrooms/chatroom-model";
+import { Messages } from "../models/messages/message-model";
 
 
 
 
-enum Role {
-    ADMIN,
-    USER
-}
+export function formatResponse(res: any) {
+    if (res instanceof ChatRoom) {
+        const combinedDataValues = { ...res.dataValues, messages: res.dataValues.Messages };
+        return combinedDataValues;
 
-interface BaseAttr {
-    id?: number;
-    uid?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
+    }
+    else if (res instanceof Messages) {
+        return res?.dataValues?.ChatRoom
+    }
 
-
-
-interface GenericInstance<T> extends Model<BaseAttr & T>, BaseAttr {
-    name?: string;
-    username?: string
-    email?: string
-    password?: string
-    role?: Role
-    content?: string,
-    title: string,
-    slug: string
-}
-
-
-export function formatResponse(res: GenericInstance<any>) {
-    return {
-        id: res?.dataValues.id,
-        title: res?.dataValues.title,
-        description: res?.dataValues.description,
-        slug: res?.dataValues.slug,
-        createdAt: res?.dataValues.createdAt,
-        updatedAt: res?.dataValues.updatedAt,
-        messages: res?.dataValues.Messages // Use the transformed Messages array from the Sequelize response
-    };
+    return {}
 }
