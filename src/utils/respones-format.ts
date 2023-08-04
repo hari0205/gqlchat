@@ -17,7 +17,7 @@ export function formatResponse(res: any) {
 
     }
     else if (res instanceof Messages) {
-        const combinedDataValues = { ...res.dataValues, messages: res.dataValues.ChatRoom };
+        const combinedDataValues = { ...res.dataValues, sentBy: res.dataValues?.User?.dataValues, room: res.dataValues?.ChatRoom?.dataValues };
         return combinedDataValues;
     } else if (res instanceof User) {
 

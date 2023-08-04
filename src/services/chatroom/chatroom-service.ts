@@ -58,8 +58,6 @@ export const addMessageMutation = async (_parent: unknown, { slug, message, sent
     })
     if (!updateChatRoom) throw new Error("Could not find chatroom. Try again");
     const res = formatResponse(updateChatRoom);
-    console.log("*************************** RESPONSE ************************");
-    console.log(res);
     return res;
 }
 

@@ -45,7 +45,7 @@ type User implements IUser{
 type Message implements IMessage{
     id:ID!
     content:String!
-    sentBy:User!
+    sentBy:User
     room:ChatRoom
 
 }

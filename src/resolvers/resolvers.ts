@@ -55,17 +55,19 @@ export const resolvers = {
         },
         message: async (_parent: unknown, { ID }: { ID: number }, _ctx: any) => {
             const message = await Messages.findByPk(ID, {
-                include: [User]
+                include: [User, ChatRoom]
             });
-            console.log(message)
             if (!message) throw new GraphQLError("Could not find message");
-            return message;
+            const res = formatResponse(message);
+            return res;
         },
-        messages: async (_parent: unknown, args: any, _ctx: any) => {
+        messages: async (_parent: unknown, _args: any, _ctx: any) => {
             const messages = await Messages.findAll({
                 include: [User],
             });
-            return messages;
+            if (!messages) throw new GraphQLError("Could not find any message");
+            const res = formatResponse(messages);
+            return res;
         }
     },
     Mutation: {
