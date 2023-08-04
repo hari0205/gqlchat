@@ -3,6 +3,7 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../../utils";
 import bcrypt from "bcrypt";
 import { Messages } from "../messages/message-model";
+import { ChatRoom } from "../chatrooms/chatroom-model";
 
 
 export class User extends Model { }
@@ -58,3 +59,7 @@ User.addHook("beforeCreate", async (user, options) => {
     user.setDataValue("password", hashedpass);
 })
 
+User.hasMany(Messages)
+Messages.belongsTo(User)
+User.belongsToMany(ChatRoom, { through: "UserChatRoom" })
+ChatRoom.belongsToMany(User, { through: 'UserChatRoom' });

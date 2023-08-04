@@ -1,7 +1,7 @@
 import { User } from "../models/user/user-model"
 import { GraphQLError } from "graphql"
 import { createUserResolver, deleteUserResolver, updateUserResolver } from "../services/user/user-services"
-import { addMessageMutation, createChatRoomMutation, updateChatRoomMutation } from "../services/chatroom/chatroom-service"
+import { addMessageMutation, createChatRoomMutation, deleteChatRoomMutation, updateChatRoomMutation } from "../services/chatroom/chatroom-service"
 import { ChatRoom } from "../models/chatrooms/chatroom-model"
 import { Messages } from "../models/messages/message-model"
 import { formatResponse } from "../utils"
@@ -18,7 +18,9 @@ export const resolvers = {
             return { text: "Hello!" }
         },
         user: async (_parent: unknown, { ID }: { ID: string }, _ctx: any) => {
-            const user = await User.findByPk(ID);
+            const user = await User.findByPk(ID, {
+                include: [Messages],
+            });
             if (!user) throw new GraphQLError(`Could not find user with ID ${ID}`)
             return user;
         },
@@ -32,12 +34,13 @@ export const resolvers = {
                 where: {
                     id: ID,
                 },
-                include: [Messages]
+                include: [Messages, User]
             });
             if (!chatroom) throw new GraphQLError(`Could not find chatroom with ID ${ID}`)
             const res = formatResponse(chatroom)
             return res;
         },
+
         // TODO: Implement full text search
         chatRoomList: async (_parent: unknown, { slug }: { slug: string }, _ctx: any) => {
             const chatroom = await ChatRoom.findOne({
@@ -51,13 +54,17 @@ export const resolvers = {
             return chatroom;
         },
         message: async (_parent: unknown, { ID }: { ID: number }, _ctx: any) => {
-            const message = await Messages.findByPk(ID);
+            const message = await Messages.findByPk(ID, {
+                include: [User]
+            });
             console.log(message)
             if (!message) throw new GraphQLError("Could not find message");
             return message;
         },
         messages: async (_parent: unknown, args: any, _ctx: any) => {
-            const messages = await Messages.findAll();
+            const messages = await Messages.findAll({
+                include: [User],
+            });
             return messages;
         }
     },
@@ -67,9 +74,12 @@ export const resolvers = {
         updateUser: updateUserResolver,
         deleteUser: deleteUserResolver,
 
+        // TODO: Login Resolver
+
         //ChatRoom Resolvers
         createChatRoom: createChatRoomMutation,
         updateChatRoom: updateChatRoomMutation,
+        deleteChatRoom: deleteChatRoomMutation,
 
         // Messages Resolvers
         addMessage: addMessageMutation,

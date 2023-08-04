@@ -2,6 +2,7 @@ import { GraphQLError } from "graphql";
 import { ChatRoom } from "../../models/chatrooms/chatroom-model"
 import { Messages } from "../../models/messages/message-model";
 import { formatResponse } from "../../utils";
+import { User } from "../../models/user/user-model";
 
 
 
@@ -34,7 +35,7 @@ export const updateChatRoomMutation = async (_parent: unknown, { id, title }: { 
     return updatedRoom[0];
 }
 
-export const addMessageMutation = async (_parent: unknown, { slug, message }: { slug: string, message: string }, _ctx: any) => {
+export const addMessageMutation = async (_parent: unknown, { slug, message, sentBy }: { slug: string, message: string, sentBy: string }, _ctx: any) => {
     const chatroom = await ChatRoom.findOne({
         where: {
             slug,
@@ -43,20 +44,26 @@ export const addMessageMutation = async (_parent: unknown, { slug, message }: { 
     });
 
     if (!chatroom) throw new Error("Could not find chatroom. Enter valid chatroom");
+    const user = await User.findByPk(sentBy)
+    if (!user) throw new GraphQLError("Could not find user");
 
-    console.log(chatroom.dataValues);
-    const newmessage = await Messages.create({ content: message, ChatRoomId: chatroom.dataValues.id })
+
+    const newmessage = await Messages.create({ content: message, ChatRoomId: chatroom.dataValues.id, UserUid: sentBy })
     if (!newmessage) throw new GraphQLError("Could not send message");
     const updateChatRoom = await ChatRoom.findOne({
         where: {
             slug,
         },
-        include: [Messages]
+        include: [{ model: Messages, include: [User] }]
     })
-
     if (!updateChatRoom) throw new Error("Could not find chatroom. Try again");
-
     const res = formatResponse(updateChatRoom);
-
+    console.log("*************************** RESPONSE ************************");
+    console.log(res);
     return res;
+}
+
+
+export const deleteChatRoomMutation = () => {
+
 }

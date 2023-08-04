@@ -12,10 +12,10 @@ enum ROLE {
 
 interface IUser {
     uid: ID!
-    name: String!
+    name: String
     username:String!
-    email:String!
-    password:String!
+    email:String
+    password:String
 }
 
 interface IMessage{
@@ -35,16 +35,17 @@ interface IChatRoom{
 
 type User implements IUser{
     uid: ID!
-    name: String!
+    name: String
     username:String!
-    email:String!
-    password:String!
+    email:String
+    password:String
     role:ROLE
 }
 
 type Message implements IMessage{
     id:ID!
     content:String!
+    sentBy:User!
     room:ChatRoom
 
 }
@@ -115,7 +116,9 @@ type Mutation{
     ### CHATROOM MUTATIONS ####
     createChatRoom(title:String):ChatRoom!
     updateChatRoom(id:ID!,title:String):ChatRoom!
+    deleteChatRoom(id:ID!):ChatRoom
 
 
-    addMessage(slug:String!,message:String):ChatRoom
+    addMessage(slug:String!,message:String,sentBy:ID!):ChatRoom!
+
 }

@@ -52,10 +52,12 @@ ChatRoom.init({
     }
 })
 // Associations
-// User.hasMany(Messages);
-Messages.belongsTo(ChatRoom,);
-//Messages.belongsTo(User);
-ChatRoom.hasMany(Messages,);
+
+Messages.belongsTo(ChatRoom);
+ChatRoom.hasMany(Messages);
+
+
+
 
 
 
