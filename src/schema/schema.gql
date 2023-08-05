@@ -84,6 +84,11 @@ input UpdateUserInput {
     password:String
 }
 
+### Subscriptions
+type Subscription {
+    messageSent:Message
+}
+
 ### Queries
 type Query{
 

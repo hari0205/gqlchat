@@ -8,7 +8,6 @@ export const sequelize = new Sequelize({
     username: "myuser",
     password: "mypassword",
     database: "dev_db",
-    logging: true,
     port: 5432,
     pool: {
         max: 5,

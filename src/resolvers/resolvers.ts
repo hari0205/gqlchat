@@ -32,9 +32,14 @@ export const resolvers = {
         chatRoom: async (_parent: unknown, { ID }: { ID: string }, _ctx: any) => {
             const chatroom = await ChatRoom.findOne({
                 where: {
-                    id: ID,
+                    id: parseInt(ID),
                 },
-                include: [Messages, User]
+                include: [{
+                    model: Messages,
+                    include: [User]
+                }, {
+                    model: User
+                }]
             });
             if (!chatroom) throw new GraphQLError(`Could not find chatroom with ID ${ID}`)
             const res = formatResponse(chatroom)
@@ -63,7 +68,7 @@ export const resolvers = {
         },
         messages: async (_parent: unknown, _args: any, _ctx: any) => {
             const messages = await Messages.findAll({
-                include: [User],
+                include: [User, ChatRoom],
             });
             if (!messages) throw new GraphQLError("Could not find any message");
             const res = formatResponse(messages);
@@ -86,5 +91,13 @@ export const resolvers = {
         // Messages Resolvers
         addMessage: addMessageMutation,
 
+    },
+    Subscription: {
+        messageSent: {
+            subscribe: (_parent: any, _args: any, ctx: any, _: any) => {
+                return ctx.pubsub.subscribe("messageSent")
+            },
+            resolve: (payload: any) => formatResponse(payload)
+        }
     }
 }

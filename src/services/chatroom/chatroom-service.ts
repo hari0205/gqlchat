@@ -5,7 +5,6 @@ import { formatResponse } from "../../utils";
 import { User } from "../../models/user/user-model";
 
 
-
 export const createChatRoomMutation = async (_parent: unknown, { title }: { title: string }, _ctx: any) => {
     const chatroom = ChatRoom.build({ title })
     try {
@@ -44,12 +43,13 @@ export const addMessageMutation = async (_parent: unknown, { slug, message, sent
     });
 
     if (!chatroom) throw new Error("Could not find chatroom. Enter valid chatroom");
-    const user = await User.findByPk(sentBy)
+    const user = await User.findByPk(sentBy);
     if (!user) throw new GraphQLError("Could not find user");
 
 
     const newmessage = await Messages.create({ content: message, ChatRoomId: chatroom.dataValues.id, UserUid: sentBy })
     if (!newmessage) throw new GraphQLError("Could not send message");
+    _ctx.pubsub.publish("messageSent", newmessage)
     const updateChatRoom = await ChatRoom.findOne({
         where: {
             slug,
