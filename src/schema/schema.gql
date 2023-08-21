@@ -1,0 +1,132 @@
+
+## ENUMS
+enum ROLE {
+    USER,
+    ADMIN,
+}
+
+## SCALAR TYPE
+
+
+### Interfaces  
+
+interface IUser {
+    uid: ID!
+    name: String
+    username:String!
+    email:String
+    password:String
+}
+
+interface IMessage{
+    id:ID
+    content:String
+
+}
+
+interface IChatRoom{
+    id:ID
+    title:String
+    slug:String
+    messages:[Message]
+}
+
+### Types
+
+type User implements IUser{
+    uid: ID!
+    name: String
+    username:String!
+    email:String
+    password:String
+    role:ROLE
+}
+
+type Message implements IMessage{
+    id:ID!
+    content:String!
+    sentBy:User
+    room:ChatRoom
+
+}
+
+type ChatRoom implements IChatRoom{
+    id:ID
+    title:String
+    description:String
+    slug:String
+    messages:[Message]
+
+}
+
+type SearchChatRoom  {
+    id:ID!
+    title:String!
+}
+
+type Test{
+    text: String!
+}
+
+### INPUT TYPES
+input NewUserInput {
+    name: String!
+    username: String!
+    email:String!
+    password:String!
+}
+
+input LoginUserInput {
+    email: String!
+    password:String!
+}
+
+input UpdateUserInput {
+    name: String
+    username: String
+    password:String
+}
+
+### Subscriptions
+type Subscription {
+    messageSent:Message
+}
+
+### Queries
+type Query{
+
+    ## FOR TEST
+    greeting: Test
+
+    ### FOR USER
+    user(ID:ID!): User!
+    users: [User]!
+
+    ## FOR MESSAGES
+    message(ID:ID!): Message
+    messages: [Message]!
+
+
+    ## FOR CHATROOM
+    chatRoom(ID:ID!):ChatRoom
+    chatRoomList(slug:String!):[SearchChatRoom]
+}
+
+
+### Mutations
+type Mutation{
+
+    ### USER MUTATIONS #######
+    createUser(createinput:NewUserInput!): User!
+    updateUser(uname:String,updateinput:UpdateUserInput):User!
+    deleteUser(uid:ID!):User!
+
+    ### CHATROOM MUTATIONS ####
+    createChatRoom(title:String):ChatRoom!
+    updateChatRoom(id:ID!,title:String):ChatRoom!
+    deleteChatRoom(id:ID!):ChatRoom
+
+
+    addMessage(slug:String!,message:String,sentBy:ID!):ChatRoom!
+
+}
