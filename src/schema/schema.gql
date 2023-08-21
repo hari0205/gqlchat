@@ -64,6 +64,11 @@ type SearchChatRoom  {
     title:String!
 }
 
+
+type Token{
+    token:String
+}
+
 type Test{
     text: String!
 }
@@ -129,4 +134,6 @@ type Mutation{
 
     addMessage(slug:String!,message:String,sentBy:ID!):ChatRoom!
 
+    ### Login #####
+    login(loginInput:LoginUserInput!):Token!
 }

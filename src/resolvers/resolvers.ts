@@ -83,7 +83,7 @@ export const resolvers = {
 
 
         // TODO: Login Resolver
-        loginUser: loginResolver,
+        login: loginResolver,
 
         //ChatRoom Resolvers
         createChatRoom: createChatRoomMutation,

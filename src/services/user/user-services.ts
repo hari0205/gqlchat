@@ -2,7 +2,8 @@
 import { LoginInput, NewUserInput, UpdateUserInput } from "./user_types"
 import { User } from "../../models/user/user-model"
 import { GraphQLError } from "graphql"
-
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const createUserResolver = async (parent: unknown, { createinput }: { createinput: NewUserInput }, context: any): Promise<User> => {
     const { name, username, password, email } = createinput;
@@ -67,6 +68,38 @@ export const loginResolver = async (parent: unknown, { loginInput }: { loginInpu
     const { email, password } = loginInput;
 
     if (!email || !password) throw new GraphQLError("Enter a valid email and password")
+
+    try {
+        const user = await User.findOne({
+            where: {
+                email
+            }
+        })
+
+        if (!user) throw new GraphQLError("User not found");
+
+        const validPassword = await bcrypt.compare(password, user.getDataValue("password"));
+        if (!validPassword) {
+            throw new GraphQLError('Invalid password');
+        }
+
+        const token = jwt.sign({
+            email: await user.getDataValue("email"),
+        }, process.env.JWT_SECRET as string, {
+            algorithm: "HS256",
+            expiresIn: "1d",
+
+        })
+
+
+        return {
+            token
+        }
+
+    }
+    catch (e: any) {
+        throw new Error('An error occurred while logging in');
+    }
 
 
 }

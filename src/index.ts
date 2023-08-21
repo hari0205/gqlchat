@@ -11,6 +11,7 @@ import { WebSocketServer } from "ws";
 import { expressMiddleware } from "@apollo/server/express4"
 import bodyParser from "body-parser";
 import { makeExecutableSchema } from "graphql-tools";
+import dontenv from "dotenv";
 
 interface MyContext {
     pubsub: PubSub
@@ -18,6 +19,7 @@ interface MyContext {
 }
 
 
+dontenv.config()
 
 const typeDefs = fs.readFileSync(__dirname + "/schema/schema.gql", "utf8");
 export const pubsub = new PubSub();
