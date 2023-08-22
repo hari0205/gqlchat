@@ -12,9 +12,14 @@ import { expressMiddleware } from "@apollo/server/express4"
 import bodyParser from "body-parser";
 import { makeExecutableSchema } from "graphql-tools";
 import dontenv from "dotenv";
+import { GraphQLError } from "graphql";
+import { User } from "./models/user/user-model";
+import { Request } from "express";
+import { getUserfromToken } from "./utils";
+
 
 interface MyContext {
-    pubsub: PubSub
+    user?: User,
 
 }
 
@@ -55,15 +60,25 @@ export const pubsub = new PubSub();
                         await serverCleanup.dispose()
                     }
                 }
-            }
+            },
+        }, {
+            async requestDidStart({ contextValue }) {
+
+            },
         }],
+
     });
     await server.start();
 
-    app.use("/graphql", bodyParser.json(), expressMiddleware(server, {
-        context: async () => ({ pubsub }),
-    }));
-
+    app.use("/graphql",
+        bodyParser.json(),
+        expressMiddleware(server, {
+            context: async ({ req }) => {
+                const user = await getUserfromToken(req);
+                return { user }
+            },
+        })
+    )
     httpServer.listen(4000, () => console.log(`Server listening on localhost:4000/graphql`))
 
 })()

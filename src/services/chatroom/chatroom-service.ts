@@ -8,6 +8,7 @@ import { User } from "../../models/user/user-model";
 
 export const createChatRoomMutation = async (_parent: unknown, { title }: { title: string }, _ctx: any) => {
     const chatroom = ChatRoom.build({ title })
+    console.log(_ctx);
     try {
         const saved_room = await chatroom.save();
         if (!saved_room) throw new GraphQLError(`Could not create chat room!, Chat room with title ${title} may already exist.`);
