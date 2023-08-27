@@ -8,7 +8,6 @@ import { User } from "../../models/user/user-model";
 
 export const createChatRoomMutation = async (_parent: unknown, { title }: { title: string }, _ctx: any) => {
     const chatroom = ChatRoom.build({ title })
-    console.log(_ctx);
     try {
         const saved_room = await chatroom.save();
         if (!saved_room) throw new GraphQLError(`Could not create chat room!, Chat room with title ${title} may already exist.`);
@@ -48,8 +47,7 @@ export const addMessageMutation = async (_parent: unknown, { slug, message, sent
     const user = await User.findByPk(sentBy);
     if (!user) throw new GraphQLError("Could not find user");
 
-
-    const newmessage = await Messages.create({ content: message, ChatRoomId: chatroom.dataValues.id, UserUid: sentBy })
+    const newmessage = await Messages.create({ content: message, ChatRoomId: chatroom.dataValues.id, UserUid: ctx.user.uid })
     if (!newmessage) throw new GraphQLError("Could not send message");
     ctx.pubsub.publish("messageSent", { newmessage, slug })
     const updateChatRoom = await ChatRoom.findOne({
@@ -65,5 +63,13 @@ export const addMessageMutation = async (_parent: unknown, { slug, message, sent
 
 
 export const deleteChatRoomMutation = async (_parent: unknown, { slug, message, sentBy }: { slug: string, message: string, sentBy: string }, ctx: any) => {
+    const chatroom = await ChatRoom.destroy({
+        where: {
+            slug,
+        },
 
+    })
+
+    if (chatroom > 0) return "Chatroom deleted successfully!";
+    return "Unable to delete chatroom";
 }

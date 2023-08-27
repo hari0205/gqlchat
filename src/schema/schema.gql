@@ -129,7 +129,7 @@ type Mutation{
     ### CHATROOM MUTATIONS ####
     createChatRoom(title:String):ChatRoom!
     updateChatRoom(id:ID!,title:String):ChatRoom!
-    deleteChatRoom(id:ID!):ChatRoom
+    deleteChatRoom(id:ID!):String
 
 
     addMessage(slug:String!,message:String,sentBy:ID!):ChatRoom!

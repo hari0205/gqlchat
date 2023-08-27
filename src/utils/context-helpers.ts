@@ -16,7 +16,8 @@ export async function getUserfromToken(req: any) {
         const user = await User.findOne({
             where: {
                 email: decoded.email
-            }
+            },
+            attributes: { exclude: ["password"] }
         })
 
         return user?.dataValues

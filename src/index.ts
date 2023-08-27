@@ -20,6 +20,7 @@ import { getUserfromToken } from "./utils";
 
 interface MyContext {
     user?: User,
+    pubsub: PubSub
 
 }
 
@@ -63,7 +64,7 @@ export const pubsub = new PubSub();
             },
         }, {
             async requestDidStart({ contextValue }) {
-
+                // Only to check if the context value is initialized properly.
             },
         }],
 
@@ -75,7 +76,7 @@ export const pubsub = new PubSub();
         expressMiddleware(server, {
             context: async ({ req }) => {
                 const user = await getUserfromToken(req);
-                return { user }
+                return { user, pubsub }
             },
         })
     )
